@@ -98,3 +98,13 @@ client2: killing process 1968
 client2: error: unexpected end-of-file
 ./run-test: line 30: 32321 Terminated              run_test client3
 ```
+
+## Analysis
+
+* Happens when two nix-copy-close copy the same drv at the same time.
+* Happens with nix 2.2.2 and master
+
+
+## TODO
+
+Does it also break with ssh-ng:// ?

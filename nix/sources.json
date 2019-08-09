@@ -1,4 +1,16 @@
 {
+    "nix": {
+        "branch": "master",
+        "description": "Nix, the purely functional package manager",
+        "homepage": "http://nixos.org/nix/",
+        "owner": "NixOS",
+        "repo": "nix",
+        "rev": "35ebae198f5af5b5283bfb36ef6e85a29006e4c9",
+        "sha256": "12x15c1b09nbypj4yv6kn0kra36sy1w9xnm77dbrvbaf2g476g5a",
+        "type": "tarball",
+        "url": "https://github.com/NixOS/nix/archive/35ebae198f5af5b5283bfb36ef6e85a29006e4c9.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "nixpkgs": {
         "branch": "nixos-19.03",
         "description": "A read-only mirror of NixOS/nixpkgs tracking the released channels. Send issues and PRs to",
