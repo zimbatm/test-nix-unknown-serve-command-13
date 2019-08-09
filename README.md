@@ -103,7 +103,7 @@ client2: error: unexpected end-of-file
 
 * Happens when two nix-copy-close copy the same drv at the same time.
 * Happens with nix 2.2.2 and master
-
+* Also works with 1 vcpu on the server
 
 ## TODO
 

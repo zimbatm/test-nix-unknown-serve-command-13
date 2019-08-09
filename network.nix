@@ -33,7 +33,6 @@
     ];
     networking.hostName = "server";
     deployment.targetEnv = "virtualbox";
-    deployment.virtualbox.vcpu = 2;
     deployment.virtualbox.headless = true;
   };
 }
