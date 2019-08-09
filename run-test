@@ -25,8 +25,10 @@ wait_all() {
 cleanup_jobs() {
   local ret=$?
   set +e
-  echo "exit $ret"
-  for job in $(jobs -r -p); do kill "$job"; done
+  for job in $(jobs -r -p); do
+    kill "$job";
+    wait "$job";
+  done
   exit $ret
 }
 trap cleanup_jobs EXIT
@@ -52,7 +54,7 @@ run_test() {
   local host=$1
 cat <<'SSH_SESSION' | nixops ssh "$host" bash 2>&1 | sed -e "s/^/$host: /"
 set -euo pipefail
-nix-copy-closure --to nix-ssh@server ./libreoffice.drv
+nix-copy-closure -vvvvvv --to nix-ssh@server ./libreoffice.drv
 echo BYE
 SSH_SESSION
 }
