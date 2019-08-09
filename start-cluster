@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! [ -f id_rsa ]; then
+  echo "No SSH key found, adding one:"
+  ssh-keygen -f id_rsa -t rsa -N ''
+fi
+
+if ! nixops info -d "$NIXOPS_DEPLOYMENT" ; then
+  nixops create -d "$NIXOPS_DEPLOYMENT" ./network.nix
+fi
+nixops deploy -d "$NIXOPS_DEPLOYMENT" --allow-reboot

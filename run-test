@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+## Functions ##
+
+banner() {
+  echo "**********************************************************"
+  echo "* $*"
+  echo "**********************************************************"
+}
+
+wait_all() {
+  local res=0
+  while [[ $(jobs -r -p | wc -l) -gt 0 ]]; do 
+    jobs -l
+    wait -n
+    res=$?
+    if [[ $res -gt 0 ]]; then
+      exit $res
+    fi
+    sleep 1
+  done
+}
+
+cleanup_jobs() {
+  local ret=$?
+  set +e
+  echo "exit $ret"
+  for job in $(jobs -r -p); do kill "$job"; done
+  exit $ret
+}
+trap cleanup_jobs EXIT
+
+prepare() {
+  local host=$1
+cat <<'SSH_SESSION' | nixops ssh "$host" bash 2>&1 | sed -e "s/^/$host: /"
+set -euo pipefail
+
+# Prepare SSH
+mkdir -p .ssh
+cp -v /etc/id_rsa .ssh/id_rsa
+chmod 0700 .ssh
+chmod 0600 .ssh/id_rsa
+
+# Prepare DRV
+
+nix-instantiate --expr '(import <nixpkgs> {}).libreoffice' --add-root ./libreoffice.drv --indirect
+SSH_SESSION
+}
+
+run_test() {
+  local host=$1
+cat <<'SSH_SESSION' | nixops ssh "$host" bash 2>&1 | sed -e "s/^/$host: /"
+set -euo pipefail
+nix-copy-closure --to nix-ssh@server ./libreoffice.drv
+echo BYE
+SSH_SESSION
+}
+
+## Main ##
+
+banner "Cleaning server"
+
+# start again with a fresh store
+nixops ssh server nix-collect-garbage -d
+
+banner "Preparing the clients"
+
+prepare client1 &
+prepare client2 &
+prepare client3 &
+
+wait_all
+
+banner "Running nix-copy-closure on all the clients"
+
+run_test client1 &
+sleep 0.5
+run_test client2 &
+sleep 0.5
+run_test client3 &
+
+wait_all
+
+echo BYE
